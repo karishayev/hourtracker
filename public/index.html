@@ -765,7 +765,38 @@
 
         calculateEarnings();
         renderHomeCalendar();
-        await saveToServer("Години успішно збережено! ✓", "save-status");
+
+        // Чітко відправляємо дані на сервер і чекаємо підтвердження
+        try {
+          const response = await fetch("/api/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: currentUser,
+              rate: userData.rate,
+              currency: userData.currency,
+              logs: userData.logs,
+            }),
+          });
+          const data = await response.json();
+
+          const statusEl = document.getElementById("save-status");
+          if (data.success) {
+            statusEl.style.color = "var(--success)";
+            statusEl.innerText = "Години успішно збережено у базу! ✓";
+          } else {
+            statusEl.style.color = "var(--danger)";
+            statusEl.innerText = "Помилка збереження на сервері";
+          }
+          setTimeout(() => {
+            statusEl.innerText = "";
+          }, 2500);
+        } catch (err) {
+          console.error("Помилка мережі", err);
+          const statusEl = document.getElementById("save-status");
+          statusEl.style.color = "var(--danger)";
+          statusEl.innerText = "Помилка зв'язку з сервером";
+        }
       }
 
       function renderPlannerCalendar() {
@@ -869,10 +900,34 @@
         renderPlannerCalendar();
         renderHomeCalendar();
         refreshTodayCard();
-        await saveToServer(
-          "Плани збережено у календар! ✓",
-          "calendar-save-status"
-        );
+
+        try {
+          const response = await fetch("/api/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: currentUser,
+              rate: userData.rate,
+              currency: userData.currency,
+              logs: userData.logs,
+            }),
+          });
+          const data = await response.json();
+
+          const statusEl = document.getElementById("calendar-save-status");
+          if (data.success) {
+            statusEl.style.color = "var(--success)";
+            statusEl.innerText = "Плани успішно збережено! ✓";
+          } else {
+            statusEl.style.color = "var(--danger)";
+            statusEl.innerText = "Помилка збереження";
+          }
+          setTimeout(() => {
+            statusEl.innerText = "";
+          }, 2500);
+        } catch (err) {
+          console.error("Помилка мережі", err);
+        }
       }
 
       function refreshTodayCard() {
