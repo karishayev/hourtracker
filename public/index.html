@@ -130,10 +130,7 @@
 
       .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(
-          2,
-          1fr
-        ); /* Робимо рівно 2 колонки на всю ширину */
+        grid-template-columns: repeat(2, 1fr);
         gap: 25px;
         margin-bottom: 25px;
       }
@@ -145,7 +142,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
         border: 1px solid var(--border-color);
         box-sizing: border-box;
-        width: 100%; /* Заповнює всю ширину колонки */
+        width: 100%;
       }
 
       .card-full {
@@ -173,8 +170,7 @@
       }
 
       input,
-      textarea,
-      select {
+      textarea {
         width: 100%;
         padding: 10px 12px;
         border: 1px solid var(--border-color);
@@ -187,8 +183,7 @@
       }
 
       input:focus,
-      textarea:focus,
-      select:focus {
+      textarea:focus {
         border-color: var(--primary);
       }
 
@@ -259,7 +254,7 @@
       .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 8px; /* Трохи більші відступи між днями */
+        gap: 6px;
         text-align: center;
       }
 
@@ -271,7 +266,7 @@
       }
 
       .calendar-cell {
-        aspect-ratio: 1.2;
+        aspect-ratio: 1.1;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -285,6 +280,7 @@
         padding: 5px;
         box-sizing: border-box;
         position: relative;
+        overflow: hidden;
       }
 
       .calendar-cell:hover {
@@ -310,7 +306,10 @@
         font-weight: bold;
         margin-bottom: 2px;
         text-align: center;
-        word-break: break-all;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .calendar-cell.has-note::after {
@@ -379,20 +378,14 @@
           grid-template-columns: 1fr;
         }
         .calendar-grid {
-          gap: 3px; /* Менші відступи між днями на екрані телефона */
+          gap: 3px;
         }
-
         .calendar-cell {
-          font-size: 11px; /* Трохи менший шрифт */
-          padding: 2px;
-        }
-
-        .cell-day-num {
           font-size: 10px;
+          padding: 3px;
         }
-
         .cell-data {
-          font-size: 8px; /* Щоб години або графік гарно поміщалися в клітинку */
+          font-size: 8px;
         }
       }
     </style>
@@ -450,9 +443,9 @@
           <h2>Вітаю, <span id="user-display"></span>! 👋</h2>
 
           <div class="dashboard-grid">
-            <!-- Фінанси та Валюта -->
+            <!-- Фінанси (тільки злоті) + Години за місяць -->
             <div class="card">
-              <h3>💰 Фінанси</h3>
+              <h3>💰 Фінанси та підсумки</h3>
               <div class="stats-row">
                 <span>Ставка:</span>
                 <span>
@@ -465,7 +458,13 @@
                   <strong>zł</strong>/год
                 </span>
               </div>
-              <div class="stats-row" style="margin-top: 15px">
+              <div class="stats-row" style="margin-top: 12px">
+                <span>Години за місяць:</span>
+                <span style="color: var(--primary)"
+                  ><strong id="month-hours-display">0</strong> год</span
+                >
+              </div>
+              <div class="stats-row" style="margin-top: 12px">
                 <span>Загалом зароблено:</span>
                 <span style="color: var(--primary)">
                   <strong id="earned-display">0</strong> <strong>zł</strong>
@@ -590,7 +589,7 @@
     <script>
       let isRegisterMode = false;
       let currentUser = null;
-      let userData = { rate: 0, currency: "грн", logs: [] };
+      let userData = { rate: 0, logs: [] };
 
       let homeDate = new Date();
       let plannerDate = new Date();
@@ -629,8 +628,7 @@
 
           if (data.success) {
             currentUser = username;
-            // Оновлюємо дані користувача з бази (гарантує, що при вході все є)
-            userData = data.user || { rate: 0, currency: "грн", logs: [] };
+            userData = data.user || { rate: 0, logs: [] };
             if (!userData.logs) userData.logs = [];
             showDashboard();
           } else {
@@ -768,7 +766,6 @@
         calculateEarnings();
         renderHomeCalendar();
 
-        // Чітко відправляємо дані на сервер і чекаємо підтвердження
         try {
           const response = await fetch("/api/update", {
             method: "POST",
@@ -776,7 +773,6 @@
             body: JSON.stringify({
               username: currentUser,
               rate: userData.rate,
-              currency: userData.currency,
               logs: userData.logs,
             }),
           });
@@ -785,19 +781,16 @@
           const statusEl = document.getElementById("save-status");
           if (data.success) {
             statusEl.style.color = "var(--success)";
-            statusEl.innerText = "Години успішно збережено у базу! ✓";
+            statusEl.innerText = "Години успішно збережено! ✓";
           } else {
             statusEl.style.color = "var(--danger)";
-            statusEl.innerText = "Помилка збереження на сервері";
+            statusEl.innerText = "Помилка збереження";
           }
           setTimeout(() => {
             statusEl.innerText = "";
           }, 2500);
         } catch (err) {
           console.error("Помилка мережі", err);
-          const statusEl = document.getElementById("save-status");
-          statusEl.style.color = "var(--danger)";
-          statusEl.innerText = "Помилка зв'язку з сервером";
         }
       }
 
@@ -846,7 +839,7 @@
           const log = userData.logs.find((l) => l.date === dateStr);
           let scheduleText = log && log.schedule ? log.schedule : "";
 
-          cell.innerHTML = `<span class="cell-day-num">${day}</span><span class="cell-data" style="font-size:9px;">${scheduleText}</span>`;
+          cell.innerHTML = `<span class="cell-day-num">${day}</span><span class="cell-data">${scheduleText}</span>`;
 
           if (log && log.note) {
             cell.classList.add("has-note");
@@ -910,7 +903,6 @@
             body: JSON.stringify({
               username: currentUser,
               rate: userData.rate,
-              currency: userData.currency,
               logs: userData.logs,
             }),
           });
@@ -957,27 +949,28 @@
         await saveToServer("Збережено ✓", "save-status");
       }
 
-      async function updateCurrency() {
-        userData.currency = document.getElementById("currency-select").value;
-        applyCurrencySymbols();
-        await saveToServer("Збережено ✓", "save-status");
-      }
-
-      function applyCurrencySymbols() {
-        const curr = userData.currency || "грн";
-        document
-          .querySelectorAll(".currency-label")
-          .forEach((el) => (el.innerText = curr));
-      }
-
       function calculateEarnings() {
         const rate = userData.rate || 0;
-        const totalHours = userData.logs.reduce(
-          (sum, l) => sum + (l.h || 0),
-          0
-        );
+
+        // Рахуємо години та заробіток за поточний місяць, який зараз переглядається в календарі годин
+        const currentYear = homeDate.getFullYear();
+        const currentMonth = homeDate.getMonth() + 1; // 1-12
+
+        let monthHours = 0;
+        userData.logs.forEach((l) => {
+          if (
+            l.date &&
+            l.date.startsWith(
+              `${currentYear}-${String(currentMonth).padStart(2, "0")}`
+            )
+          ) {
+            monthHours += l.h || 0;
+          }
+        });
+
+        document.getElementById("month-hours-display").innerText = monthHours;
         document.getElementById("earned-display").innerText = (
-          totalHours * rate
+          monthHours * rate
         ).toFixed(2);
       }
 
@@ -1006,7 +999,7 @@
 
       function logout() {
         currentUser = null;
-        userData = { rate: 0, currency: "грн", logs: [] };
+        userData = { rate: 0, logs: [] };
         document.getElementById("app-wrapper").style.display = "none";
         document.getElementById("auth-wrapper").style.display = "flex";
         document.getElementById("password").value = "";
