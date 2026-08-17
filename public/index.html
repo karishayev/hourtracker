@@ -437,33 +437,23 @@
             <!-- Фінанси та Валюта -->
             <div class="card">
               <h3>💰 Фінанси</h3>
-              <div class="input-group">
-                <label>Валюта</label>
-                <select id="currency-select" onchange="updateCurrency()">
-                  <option value="грн">UAH (грн)</option>
-                  <option value="$">USD ($)</option>
-                  <option value="€">EUR (€)</option>
-                  <option value="zł">PLN (zł)</option>
-                </select>
-              </div>
               <div class="stats-row">
                 <span>Ставка:</span>
-                <span
-                  ><input
+                <span>
+                  <input
                     type="number"
                     id="rate-input"
                     style="width: 90px; display: inline-block; padding: 4px"
                     oninput="updateRate()"
                   />
-                  <span class="currency-label">грн</span>/год</span
-                >
+                  <strong>zł</strong>/год
+                </span>
               </div>
               <div class="stats-row" style="margin-top: 15px">
                 <span>Загалом зароблено:</span>
-                <span style="color: var(--primary)"
-                  ><strong id="earned-display">0</strong>
-                  <span class="currency-label">грн</span></span
-                >
+                <span style="color: var(--primary)">
+                  <strong id="earned-display">0</strong> <strong>zł</strong>
+                </span>
               </div>
             </div>
 
@@ -640,10 +630,6 @@
         document.getElementById("app-wrapper").style.display = "flex";
         document.getElementById("user-display").innerText = currentUser;
         document.getElementById("rate-input").value = userData.rate || "";
-        document.getElementById("currency-select").value =
-          userData.currency || "грн";
-
-        applyCurrencySymbols();
 
         const todayStr = new Date().toISOString().split("T")[0];
         selectedHomeDateStr = todayStr;
@@ -987,7 +973,6 @@
             body: JSON.stringify({
               username: currentUser,
               rate: userData.rate,
-              currency: userData.currency,
               logs: userData.logs,
             }),
           });
