@@ -23,27 +23,136 @@
         margin: 0;
         padding: 0;
         display: flex;
-        justify-content: center;
-        align-items: center;
         min-height: 100vh;
       }
 
-      .container {
+      /* Екран авторизації */
+      #auth-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .auth-card {
         width: 100%;
-        max-width: 450px;
+        max-width: 400px;
         background: var(--card-bg);
         padding: 30px;
         border-radius: 16px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         box-sizing: border-box;
-        margin: 20px;
+      }
+
+      /* Головний додаток із сайдбаром */
+      #app-wrapper {
+        display: none;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+      }
+
+      /* Бокова панель навігації */
+      .sidebar {
+        width: 260px;
+        background: var(--card-bg);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .sidebar-brand {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 30px;
+        padding-left: 10px;
+      }
+
+      .nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+      }
+
+      .nav-links li {
+        margin-bottom: 10px;
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background 0.2s, color 0.2s;
+        cursor: pointer;
+      }
+
+      .nav-links a:hover,
+      .nav-links a.active {
+        background-color: #eef2ff;
+        color: var(--primary);
+      }
+
+      .sidebar-footer {
+        border-top: 1px solid var(--border-color);
+        padding-top: 15px;
+      }
+
+      /* Основний контент справа */
+      .main-content {
+        flex-grow: 1;
+        padding: 40px;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+
+      .page-section {
+        display: none;
+        max-width: 800px;
+      }
+
+      .page-section.active {
+        display: block;
       }
 
       h2 {
         margin-top: 0;
-        color: var(--text-color);
         font-size: 24px;
+        margin-bottom: 25px;
+      }
+
+      /* Сітка елементів на головній сторінці */
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
         margin-bottom: 20px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        border: 1px solid var(--border-color);
+      }
+
+      .card-full {
+        grid-column: span 2;
+      }
+
+      .card h3 {
+        margin-top: 0;
+        font-size: 16px;
+        color: #4b5563;
+        margin-bottom: 15px;
       }
 
       .input-group {
@@ -55,111 +164,77 @@
         display: block;
         margin-bottom: 5px;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
+        color: #4b5563;
       }
 
-      input {
+      input,
+      textarea {
         width: 100%;
-        padding: 12px;
+        padding: 10px 12px;
         border: 1px solid var(--border-color);
         border-radius: 8px;
         box-sizing: border-box;
         font-size: 14px;
         outline: none;
         transition: border-color 0.2s;
+        font-family: inherit;
       }
 
-      input:focus {
+      input:focus,
+      textarea:focus {
         border-color: var(--primary);
       }
 
       button {
-        width: 100%;
-        padding: 12px;
+        padding: 10px 16px;
         background-color: var(--primary);
         color: white;
         border: none;
         border-radius: 8px;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
         cursor: pointer;
         transition: background-color 0.2s;
-        margin-top: 10px;
       }
 
       button:hover {
         background-color: var(--primary-hover);
       }
 
-      .secondary-btn {
-        background-color: #6b7280;
+      .danger-btn {
+        background-color: var(--danger);
+        width: 100%;
       }
-      .secondary-btn:hover {
-        background-color: #4b5563;
+      .danger-btn:hover {
+        background-color: #dc2626;
+      }
+
+      .stats-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 10px;
       }
 
       .error-msg {
         color: var(--danger);
-        font-size: 14px;
-        margin-top: 10px;
+        font-size: 13px;
+        margin-top: 8px;
         text-align: center;
       }
-
       .success-msg {
         color: var(--success);
-        font-size: 14px;
-        margin-top: 10px;
-        text-align: center;
-      }
-
-      /* Стилі для кабінету */
-      .dashboard {
-        display: none;
-      }
-
-      .today-card {
-        background: #eef2ff;
-        border-left: 4px solid var(--primary);
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        text-align: left;
-      }
-
-      .today-card h3 {
-        margin: 0 0 8px 0;
-        color: var(--primary);
-        font-size: 16px;
-      }
-
-      .today-card p {
-        margin: 4px 0;
-        font-size: 14px;
-      }
-
-      .stats {
-        display: flex;
-        justify-content: space-between;
-        background: #f9fafb;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 14px;
-      }
-
-      .logout-btn {
-        background-color: var(--danger);
-        margin-top: 20px;
-      }
-      .logout-btn:hover {
-        background-color: #dc2626;
+        font-size: 13px;
+        margin-top: 8px;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <!-- ВХІД / РЕЄСТРАЦІЯ -->
-      <div id="auth-section">
+    <!-- ЕКРАН АВТОРИЗАЦІЇ -->
+    <div id="auth-wrapper">
+      <div class="auth-card">
         <h2 id="form-title">Вхід в систему</h2>
         <div class="input-group">
           <label>Ім'я користувача</label>
@@ -169,59 +244,157 @@
           <label>Пароль</label>
           <input type="password" id="password" placeholder="Введіть пароль" />
         </div>
-        <button onclick="handleAuth()">Увійти</button>
-        <button class="secondary-btn" onclick="toggleAuthMode()">
+        <button style="width: 100%; margin-top: 10px" onclick="handleAuth()">
+          Увійти
+        </button>
+        <button
+          style="width: 100%; margin-top: 10px; background-color: #6b7280"
+          onclick="toggleAuthMode()"
+        >
           Створити акаунт
         </button>
         <div id="message" class="error-msg"></div>
       </div>
+    </div>
 
-      <!-- ГОЛОВНИЙ КАБІНЕТ -->
-      <div id="dashboard-section" class="dashboard">
-        <h2>Вітаю, <span id="user-display"></span>! 👋</h2>
-
-        <!-- Блок сьогоднішнього дня (план/графік/нотатка) -->
-        <div class="today-card">
-          <h3>📅 План на сьогодні (<span id="current-date-str"></span>)</h3>
-          <p>
-            <strong>Графік:</strong>
-            <span id="today-schedule">Ще не задано в календарі</span>
-          </p>
-          <p>
-            <strong>Нотатка:</strong>
-            <span id="today-note">Немає нотаток на сьогодні</span>
-          </p>
+    <!-- ГОЛОВНИЙ ДОДАТОК З САЙДБАРОМ -->
+    <div id="app-wrapper" style="display: none">
+      <!-- Сайдбар навігації -->
+      <nav class="sidebar">
+        <div class="sidebar-brand">⏱️ Hour Tracker</div>
+        <ul class="nav-links">
+          <li>
+            <a onclick="switchPage('home')" id="nav-home" class="active"
+              >🏠 Головна</a
+            >
+          </li>
+          <li>
+            <a onclick="switchPage('calendar')" id="nav-calendar"
+              >📅 Календар і плани</a
+            >
+          </li>
+        </ul>
+        <div class="sidebar-footer">
+          <button class="danger-btn" onclick="logout()">Вийти</button>
         </div>
+      </nav>
 
-        <div class="stats">
-          <span>Ставка: <strong id="rate-display">0</strong> грн/год</span>
-          <span>Заробіток: <strong id="earned-display">0</strong> грн</span>
-        </div>
+      <!-- Основна робоча зона -->
+      <main class="main-content">
+        <!-- СТОРІНКА 1: ГОЛОВНА -->
+        <section id="page-home" class="page-section active">
+          <h2>Вітаю, <span id="user-display"></span>! 👋</h2>
 
-        <div class="input-group">
-          <label>Поточна ставка (грн/год)</label>
-          <input
-            type="number"
-            id="rate-input"
-            placeholder="Введіть ставку"
-            oninput="updateData()"
-          />
-        </div>
+          <div class="dashboard-grid">
+            <!-- Картка 1: Ставка і заробіток -->
+            <div class="card">
+              <h3>💰 Фінанси</h3>
+              <div class="stats-row">
+                <span>Ставка:</span>
+                <span
+                  ><input
+                    type="number"
+                    id="rate-input"
+                    style="width: 90px; display: inline-block; padding: 5px"
+                    oninput="updateRate()"
+                  />
+                  грн/год</span
+                >
+              </div>
+              <div class="stats-row" style="margin-top: 15px">
+                <span>Загалом зароблено:</span>
+                <span style="color: var(--primary)"
+                  ><strong id="earned-display">0</strong> грн</span
+                >
+              </div>
+            </div>
 
-        <div class="input-group">
-          <label>Фактично відпрацьовані години за сьогодні</label>
-          <input
-            type="number"
-            id="hours-input"
-            placeholder="Наприклад: 8"
-            oninput="updateData()"
-          />
-        </div>
+            <!-- Картка 2: Додати години за сьогодні -->
+            <div class="card">
+              <h3>⏱️ Облік годин за сьогодні</h3>
+              <div class="input-group">
+                <label
+                  >Відпрацьовано годин (<span id="today-date-label"></span
+                  >)</label
+                >
+                <input
+                  type="number"
+                  id="hours-input"
+                  placeholder="Наприклад: 8"
+                  oninput="updateTodayHours()"
+                />
+              </div>
+              <div id="save-status" class="success-msg"></div>
+            </div>
 
-        <div id="save-status" class="success-msg"></div>
+            <!-- Картка 3: Графік роботи і нотатки на сьогодні (На всю ширину) -->
+            <div class="card card-full">
+              <h3>📌 Розклад та нотатки на сьогодні</h3>
+              <p style="margin: 0 0 10px 0">
+                <strong>Плановий графік:</strong>
+                <span
+                  id="today-schedule-display"
+                  style="color: var(--primary); font-weight: 600"
+                  >Не задано в календарі</span
+                >
+              </p>
+              <p style="margin: 0 0 5px 0">
+                <strong>Нотатка / Задача:</strong>
+              </p>
+              <div
+                id="today-note-display"
+                style="
+                  background: #f9fafb;
+                  padding: 12px;
+                  border-radius: 8px;
+                  border: 1px solid var(--border-color);
+                  color: #4b5563;
+                  min-height: 40px;
+                "
+              >
+                Немає нотаток на сьогодні. Додайте їх у розділі «Календар і
+                плани».
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <button class="logout-btn" onclick="logout()">Вийти з акаунта</button>
-      </div>
+        <!-- СТОРІНКА 2: КАЛЕНДАР І ПЛАНИ -->
+        <section id="page-calendar" class="page-section">
+          <h2>📅 Планування та графік</h2>
+          <div class="card">
+            <h3>Виберіть дату для налаштування графіку й нотатки</h3>
+            <div class="input-group">
+              <label>Дата</label>
+              <input
+                type="date"
+                id="calendar-date-picker"
+                onchange="loadDayData()"
+              />
+            </div>
+            <div class="input-group">
+              <label>Графік роботи (наприклад: 9:00 - 18:00)</label>
+              <input
+                type="text"
+                id="calendar-schedule-input"
+                placeholder="Введіть графік"
+              />
+            </div>
+            <div class="input-group">
+              <label>Нотатка / Важливі плани на цей день</label>
+              <textarea
+                id="calendar-note-input"
+                rows="4"
+                placeholder="Що треба зробити в цей день?"
+              ></textarea>
+            </div>
+            <button onclick="saveCalendarDay()">
+              Зберегти плани на цей день
+            </button>
+            <div id="calendar-save-status" class="success-msg"></div>
+          </div>
+        </section>
+      </main>
     </div>
 
     <script>
@@ -234,11 +407,8 @@
         document.getElementById("form-title").innerText = isRegisterMode
           ? "Створити акаунт"
           : "Вхід в систему";
-        document.querySelector('button[onclick="handleAuth()"]').innerText =
+        document.querySelector("#auth-wrapper button").innerText =
           isRegisterMode ? "Зареєструватися" : "Увійти";
-        document.querySelector(".secondary-btn").innerText = isRegisterMode
-          ? "Маю акаунт"
-          : "Створити акаунт";
         document.getElementById("message").innerText = "";
       }
 
@@ -275,41 +445,43 @@
       }
 
       function showDashboard() {
-        document.getElementById("auth-section").style.display = "none";
-        document.getElementById("dashboard-section").style.display = "block";
+        document.getElementById("auth-wrapper").style.display = "none";
+        document.getElementById("app-wrapper").style.display = "flex";
         document.getElementById("user-display").innerText = currentUser;
 
+        const todayStr = new Date().toISOString().split("T")[0];
+        document.getElementById("today-date-label").innerText = todayStr;
         document.getElementById("rate-input").value = userData.rate || "";
 
-        // Заповнення сьогоднішніх даних
-        const todayStr = new Date().toISOString().split("T")[0];
-        document.getElementById("current-date-str").innerText = todayStr;
+        // Ініціалізація дати в календарі на сьогодні
+        document.getElementById("calendar-date-picker").value = todayStr;
+        loadDayData();
 
-        const todayLog = userData.logs.find((l) => l.date === todayStr);
-        if (todayLog) {
-          document.getElementById("today-schedule").innerText =
-            todayLog.schedule || "Не вказано";
-          document.getElementById("today-note").innerText =
-            todayLog.note || "Немає нотаток";
-          document.getElementById("hours-input").value = todayLog.h || "";
-        }
-
+        refreshHomeData();
         calculateEarnings();
       }
 
-      async function updateData() {
-        const rate =
-          parseFloat(document.getElementById("rate-input").value) || 0;
+      function switchPage(pageId) {
+        document
+          .querySelectorAll(".page-section")
+          .forEach((sec) => sec.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-links a")
+          .forEach((link) => link.classList.remove("active"));
+
+        document.getElementById("page-" + pageId).classList.add("active");
+        document.getElementById("nav-" + pageId).classList.add("active");
+      }
+
+      // Оновлення годин за сьогодні з головної сторінки
+      async function updateTodayHours() {
         const hours =
           parseFloat(document.getElementById("hours-input").value) || 0;
         const todayStr = new Date().toISOString().split("T")[0];
 
-        userData.rate = rate;
-
-        // Оновлюємо або додаємо сьогоднішній лог
-        let todayLog = userData.logs.find((l) => l.date === todayStr);
-        if (todayLog) {
-          todayLog.h = hours;
+        let dayLog = userData.logs.find((l) => l.date === todayStr);
+        if (dayLog) {
+          dayLog.h = hours;
         } else {
           userData.logs.push({
             date: todayStr,
@@ -320,8 +492,100 @@
         }
 
         calculateEarnings();
+        await saveToServer("Збережено ✓", "save-status");
+      }
 
-        // Відправляємо на сервер
+      async function updateRate() {
+        userData.rate =
+          parseFloat(document.getElementById("rate-input").value) || 0;
+        calculateEarnings();
+        await saveToServer("Збережено ✓", "save-status");
+      }
+
+      // Завантаження даних обраного дня у вкладці "Календар"
+      function loadDayData() {
+        const selectedDate = document.getElementById(
+          "calendar-date-picker"
+        ).value;
+        const dayLog = userData.logs.find((l) => l.date === selectedDate);
+
+        if (dayLog) {
+          document.getElementById("calendar-schedule-input").value =
+            dayLog.schedule || "";
+          document.getElementById("calendar-note-input").value =
+            dayLog.note || "";
+        } else {
+          document.getElementById("calendar-schedule-input").value = "";
+          document.getElementById("calendar-note-input").value = "";
+        }
+      }
+
+      // Збереження графіку/нотатки з вкладки "Календар"
+      async function saveCalendarDay() {
+        const selectedDate = document.getElementById(
+          "calendar-date-picker"
+        ).value;
+        const schedule = document
+          .getElementById("calendar-schedule-input")
+          .value.trim();
+        const note = document
+          .getElementById("calendar-note-input")
+          .value.trim();
+
+        if (!selectedDate) return;
+
+        let dayLog = userData.logs.find((l) => l.date === selectedDate);
+        if (dayLog) {
+          dayLog.schedule = schedule;
+          dayLog.note = note;
+        } else {
+          userData.logs.push({
+            date: selectedDate,
+            schedule: schedule,
+            h: 0,
+            note: note,
+          });
+        }
+
+        refreshHomeData();
+        await saveToServer(
+          "План успішно збережено у календар! ✓",
+          "calendar-save-status"
+        );
+      }
+
+      // Оновлення відображення на головній сторінці
+      function refreshHomeData() {
+        const todayStr = new Date().toISOString().split("T")[0];
+        const todayLog = userData.logs.find((l) => l.date === todayStr);
+
+        if (todayLog) {
+          document.getElementById("today-schedule-display").innerText =
+            todayLog.schedule || "Не задано в календарі";
+          document.getElementById("today-note-display").innerText =
+            todayLog.note || "Немає нотаток на сьогодні.";
+          document.getElementById("hours-input").value = todayLog.h || "";
+        } else {
+          document.getElementById("today-schedule-display").innerText =
+            "Не задано в календарі";
+          document.getElementById("today-note-display").innerText =
+            "Немає нотаток на сьогодні.";
+          document.getElementById("hours-input").value = "";
+        }
+      }
+
+      function calculateEarnings() {
+        const rate = userData.rate || 0;
+        const totalHours = userData.logs.reduce(
+          (sum, l) => sum + (l.h || 0),
+          0
+        );
+        document.getElementById("earned-display").innerText = (
+          totalHours * rate
+        ).toFixed(2);
+      }
+
+      async function saveToServer(successText, statusElementId) {
         try {
           await fetch("/api/update", {
             method: "POST",
@@ -332,33 +596,21 @@
               logs: userData.logs,
             }),
           });
-          const statusEl = document.getElementById("save-status");
-          statusEl.innerText = "Збережено ✓";
+          const statusEl = document.getElementById(statusElementId);
+          statusEl.innerText = successText;
           setTimeout(() => {
             statusEl.innerText = "";
-          }, 1500);
+          }, 2000);
         } catch (err) {
-          console.error("Помилка збереження");
+          console.error("Помилка збереження на сервері");
         }
-      }
-
-      function calculateEarnings() {
-        const rate = userData.rate || 0;
-        const totalHours = userData.logs.reduce(
-          (sum, l) => sum + (l.h || 0),
-          0
-        );
-        document.getElementById("rate-display").innerText = rate;
-        document.getElementById("earned-display").innerText = (
-          totalHours * rate
-        ).toFixed(2);
       }
 
       function logout() {
         currentUser = null;
         userData = { rate: 0, logs: [] };
-        document.getElementById("dashboard-section").style.display = "none";
-        document.getElementById("auth-section").style.display = "block";
+        document.getElementById("app-wrapper").style.display = "none";
+        document.getElementById("auth-wrapper").style.display = "flex";
         document.getElementById("password").value = "";
       }
     </script>
