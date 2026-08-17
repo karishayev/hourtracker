@@ -130,7 +130,10 @@
 
       .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        grid-template-columns: repeat(
+          2,
+          1fr
+        ); /* Робимо рівно 2 колонки на всю ширину */
         gap: 25px;
         margin-bottom: 25px;
       }
@@ -142,6 +145,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
         border: 1px solid var(--border-color);
         box-sizing: border-box;
+        width: 100%; /* Заповнює всю ширину колонки */
       }
 
       .card-full {
@@ -255,7 +259,7 @@
       .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 6px;
+        gap: 8px; /* Трохи більші відступи між днями */
         text-align: center;
       }
 
@@ -267,7 +271,7 @@
       }
 
       .calendar-cell {
-        aspect-ratio: 1;
+        aspect-ratio: 1.2;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
