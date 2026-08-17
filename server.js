@@ -28,8 +28,10 @@ const userSchema = new mongoose.Schema({
   rate: { type: Number, default: 0 },
   logs: [
     {
-      date: String,
-      h: Number,
+      date: String, // Формат "YYYY-MM-DD"
+      schedule: String, // Наприклад, "9:00 - 18:00"
+      actualHours: Number, // Фактичні години, що вводяться на головній
+      note: String, // Нотатка або задача на цей день
     },
   ],
 });
@@ -76,7 +78,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// Оновлення даних (ставки, годин, логів)
+// Оновлення даних (ставки, годин, графіків і нотаток)
 app.post("/api/update", async (req, res) => {
   try {
     const { username, rate, logs } = req.body;
