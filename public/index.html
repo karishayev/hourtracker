@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Облік Робочого Часу (MongoDB)</title>
+    <style>
+      :root {
+        --primary-color: #4f46e5;
+        --primary-hover: #4338ca;
+        --bg-color: #f9fafb;
+        --card-bg: #ffffff;
+        --text-color: #111827;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+        --border-color: #e5e7eb;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 10px;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.5rem;
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 16px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        padding: 16px;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 16px;
+      }
+
+      .summary {
+        background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);
+        color: white;
+        text-align: center;
+        padding: 15px;
+        border-radius: 16px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .summary small {
+        opacity: 0.9;
+        font-size: 0.85rem;
+      }
+      .summary div div {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-top: 4px;
+      }
+
+      label {
+        display: block;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: var(--primary-color);
+      }
+
+      button {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      button:active {
+        background: var(--primary-hover);
+      }
+
+      .secondary-btn {
+        background: #6b7280;
+        margin-top: 8px;
+      }
+
+      .sync-status {
+        font-size: 0.8rem;
+        text-align: center;
+        margin-top: 8px;
+        color: #6b7280;
+      }
+
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .calendar-header button {
+        width: auto;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        background: #f3f4f6;
+        color: var(--text-color);
+        border-radius: 8px;
+      }
+      .calendar-header h3 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        text-align: center;
+      }
+      .calendar-day-name {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #6b7280;
+        padding-bottom: 4px;
+      }
+      .calendar-day {
+        background-color: #f9fafb;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 6px 2px;
+        min-height: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+      }
+      .calendar-day.empty {
+        background-color: transparent;
+        border: none;
+      }
+      .calendar-day.worked {
+        background-color: #ecfdf5;
+        border-color: #a7f3d0;
+        color: #065f46;
+        font-weight: 600;
+      }
+      .calendar-day .hours-tag {
+        font-size: 0.65rem;
+        background-color: var(--success-color);
+        color: white;
+        padding: 1px 3px;
+        border-radius: 4px;
+        margin-top: 2px;
+      }
+
+      table {
+        width: 100%;
+        font-size: 0.85rem;
+        border-collapse: collapse;
+        margin-top: 5px;
+      }
+      th,
+      td {
+        padding: 10px 8px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+      th {
+        background: #f9fafb;
+        font-weight: 600;
+      }
+
+      .del-btn {
+        color: white;
+        background-color: var(--danger-color);
+        font-size: 0.75rem;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 6px;
+        width: auto;
+      }
+      .clear-all {
+        background: transparent;
+        color: var(--danger-color);
+        border: 1px solid var(--danger-color);
+        margin-top: 12px;
+        font-size: 0.9rem;
+        padding: 10px;
+      }
+      .empty-state {
+        text-align: center;
+        color: #6b7280;
+        font-size: 0.85rem;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>💼 Робочий Час</h1>
+
+      <!-- Екран авторизації -->
+      <div id="authCard" class="card">
+        <h3 id="authTitle" style="margin-top: 0">Вхід в систему</h3>
+        <input type="text" id="usernameInput" placeholder="Логін" />
+        <input type="password" id="passwordInput" placeholder="Пароль" />
+        <button id="authBtn" onclick="handleAuth()">Увійти</button>
+        <button class="secondary-btn" onclick="toggleAuthMode()">
+          <span id="switchAuthText">Створити акаунт</span>
+        </button>
+        <div
+          id="authError"
+          style="
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            text-align: center;
+          "
+        ></div>
+      </div>
+
+      <!-- Основний додаток (спочатку прихований) -->
+      <div id="appContent" style="display: none">
+        <div
+          class="card"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+          "
+        >
+          <span
+            id="currentUserLabel"
+            style="font-weight: 600; font-size: 0.9rem"
+          ></span>
+          <button
+            onclick="logout()"
+            style="
+              width: auto;
+              padding: 6px 12px;
+              font-size: 0.8rem;
+              background: #6b7280;
+            "
+          >
+            Вийти
+          </button>
+        </div>
+
+        <div class="card">
+          <label for="globalRate">Ставка за годину (грн)</label>
+          <input
+            type="number"
+            id="globalRate"
+            placeholder="Введіть ставку..."
+          />
+        </div>
+
+        <div class="summary">
+          <div>
+            <small>Всього годин</small>
+            <div id="totalHours">0</div>
+          </div>
+          <div>
+            <small>Зарплата</small>
+            <div id="totalEarnings">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="calendar-header">
+            <button type="button" id="prevMonth">&#10094;</button>
+            <h3 id="calendarMonthTitle">Місяць Рік</h3>
+            <button type="button" id="nextMonth">&#10095;</button>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <div class="card">
+          <label for="date">Дата</label>
+          <input type="date" id="date" />
+          <label for="hours">Кількість годин</label>
+          <input
+            type="number"
+            id="hours"
+            step="0.5"
+            min="0.1"
+            placeholder="Скільки годин?"
+          />
+          <button onclick="addEntry()">Додати запис</button>
+        </div>
+
+        <div class="card">
+          <label style="margin-bottom: 10px">Історія записів</label>
+          <div style="overflow-x: auto">
+            <table id="logTable">
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Години</th>
+                  <th>Сума</th>
+                  <th>Дія</th>
+                </tr>
+              </thead>
+              <tbody id="logBody"></tbody>
+            </table>
+          </div>
+          <div id="emptyState" class="empty-state">Ще немає записів</div>
+          <button
+            type="button"
+            id="clearAllBtn"
+            class="clear-all"
+            style="display: none"
+            onclick="clearAll()"
+          >
+            Очистити все
+          </button>
+        </div>
+        <div id="syncStatus" class="sync-status">Підключено до бази даних</div>
+      </div>
+    </div>
+
+    <script>
+      let currentUser = localStorage.getItem("currentUser") || null;
+      let rate = 0;
+      let logs = [];
+      let isRegisterMode = false;
+
+      document.getElementById("date").valueAsDate = new Date();
+      let currentCalendarDate = new Date();
+      const monthNames = [
+        "Січень",
+        "Лютий",
+        "Березень",
+        "Квітень",
+        "Травень",
+        "Червень",
+        "Липень",
+        "Серпень",
+        "Вересень",
+        "Жовтень",
+        "Листопад",
+        "Грудень",
+      ];
+
+      if (currentUser) {
+        loginDirectly(currentUser);
+      }
+
+      function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById("authTitle").innerText = isRegisterMode
+          ? "Реєстрація"
+          : "Вхід в систему";
+        document.getElementById("authBtn").innerText = isRegisterMode
+          ? "Зареєструватися"
+          : "Увійти";
+        document.getElementById("switchAuthText").innerText = isRegisterMode
+          ? "Вже є акаунт? Увійти"
+          : "Створити акаунт";
+      }
+
+      async function handleAuth() {
+        let username = document.getElementById("usernameInput").value.trim();
+        let password = document.getElementById("passwordInput").value.trim();
+        let errorEl = document.getElementById("authError");
+
+        if (!username || !password) {
+          errorEl.innerText = "Заповніть всі поля!";
+          return;
+        }
+
+        let endpoint = isRegisterMode ? "/api/register" : "/api/login";
+        try {
+          let res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+          let data = await res.json();
+          if (data.success) {
+            if (isRegisterMode) {
+              alert("Реєстрація успішна! Тепер увійдіть.");
+              toggleAuthMode();
+            } else {
+              currentUser = data.user.username;
+              rate = data.user.rate || 0;
+              logs = data.user.logs || [];
+              localStorage.setItem("currentUser", currentUser);
+              showApp();
+            }
+          } else {
+            errorEl.innerText = data.message;
+          }
+        } catch (err) {
+          errorEl.innerText = "Помилка звʼязку з сервером.";
+        }
+      }
+
+      async function loginDirectly(username) {
+        // При повторному вході підтягуємо свіжі дані з бази
+        let password = prompt(
+          "Введіть пароль для автоматичного входу під " + username + ":"
+        );
+        if (!password) {
+          logout();
+          return;
+        }
+
+        try {
+          let res = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+          let data = await res.json();
+          if (data.success) {
+            currentUser = data.user.username;
+            rate = data.user.rate || 0;
+            logs = data.user.logs || [];
+            showApp();
+          } else {
+            logout();
+          }
+        } catch (err) {
+          logout();
+        }
+      }
+
+      function showApp() {
+        document.getElementById("authCard").style.display = "none";
+        document.getElementById("appContent").style.display = "block";
+        document.getElementById(
+          "currentUserLabel"
+        ).innerText = `👤 ${currentUser}`;
+        document.getElementById("globalRate").value = rate;
+        redraw();
+      }
+
+      function logout() {
+        localStorage.removeItem("currentUser");
+        currentUser = null;
+        document.getElementById("authCard").style.display = "block";
+        document.getElementById("appContent").style.display = "none";
+      }
+
+      async function syncWithServer() {
+        if (!currentUser) return;
+        try {
+          await fetch("/api/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: currentUser, rate, logs }),
+          });
+        } catch (err) {
+          console.error("Sync error");
+        }
+      }
+
+      function redraw() {
+        let totalH = logs.reduce((sum, l) => sum + Number(l.h), 0);
+        let totalE = totalH * (parseFloat(rate) || 0);
+
+        document.getElementById("totalHours").innerText =
+          totalH.toFixed(1) + " год";
+        document.getElementById("totalEarnings").innerText = totalE.toFixed(2);
+
+        renderLogs();
+        renderCalendar();
+      }
+
+      function updateAndSave() {
+        rate = parseFloat(document.getElementById("globalRate").value) || 0;
+        redraw();
+        syncWithServer();
+      }
+
+      function addEntry() {
+        let d = document.getElementById("date").value;
+        let h = parseFloat(document.getElementById("hours").value);
+
+        if (d && h > 0) {
+          logs.push({ id: Date.now().toString(), date: d, h: h });
+          document.getElementById("hours").value = "";
+          redraw();
+          syncWithServer();
+        } else {
+          alert("Заповніть дату та години правильно.");
+        }
+      }
+
+      function del(id) {
+        logs = logs.filter((l) => l.id !== id);
+        redraw();
+        syncWithServer();
+      }
+
+      function clearAll() {
+        if (confirm("Видалити всі записи?")) {
+          logs = [];
+          redraw();
+          syncWithServer();
+        }
+      }
+
+      function renderLogs() {
+        let tbody = document.getElementById("logBody");
+        let emptyState = document.getElementById("emptyState");
+        let clearBtn = document.getElementById("clearAllBtn");
+
+        tbody.innerHTML = "";
+        if (logs.length === 0) {
+          emptyState.style.display = "block";
+          clearBtn.style.display = "none";
+          return;
+        }
+
+        emptyState.style.display = "none";
+        clearBtn.style.display = "block";
+
+        let sortedLogs = [...logs].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+        sortedLogs.forEach((l) => {
+          let sum = (l.h * (parseFloat(rate) || 0)).toFixed(2);
+          tbody.innerHTML += `
+                <tr>
+                    <td>${l.date}</td>
+                    <td>${l.h} год</td>
+                    <td><strong>${sum}</strong></td>
+                    <td><button class="del-btn" onclick="del('${l.id}')">Вид</button></td>
+                </tr>
+            `;
+        });
+      }
+
+      function renderCalendar() {
+        let grid = document.getElementById("calendarGrid");
+        grid.innerHTML = "";
+
+        let year = currentCalendarDate.getFullYear();
+        let month = currentCalendarDate.getMonth();
+        document.getElementById(
+          "calendarMonthTitle"
+        ).innerText = `${monthNames[month]} ${year}`;
+
+        let dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
+        dayNames.forEach((d) => {
+          grid.innerHTML += `<div class="calendar-day-name">${d}</div>`;
+        });
+
+        let firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+        let totalDays = new Date(year, month + 1, 0).getDate();
+
+        let logsByDate = {};
+        logs.forEach((l) => {
+          logsByDate[l.date] = (logsByDate[l.date] || 0) + Number(l.h);
+        });
+
+        for (let i = 0; i < firstDayIndex; i++) {
+          grid.innerHTML += `<div class="calendar-day empty"></div>`;
+        }
+
+        for (let day = 1; day <= totalDays; day++) {
+          let formattedMonth = String(month + 1).padStart(2, "0");
+          let formattedDay = String(day).padStart(2, "0");
+          let dateStr = `${year}-${formattedMonth}-${formattedDay}`;
+
+          let workedHours = logsByDate[dateStr];
+          let isWorked = workedHours ? "worked" : "";
+
+          let content = `<span>${day}</span>`;
+          if (workedHours) {
+            content += `<span class="hours-tag">${workedHours}г</span>`;
+          }
+          grid.innerHTML += `<div class="calendar-day ${isWorked}">${content}</div>`;
+        }
+      }
+
+      document.getElementById("prevMonth").onclick = () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        renderCalendar();
+      };
+
+      document.getElementById("nextMonth").onclick = () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        renderCalendar();
+      };
+
+      document.getElementById("globalRate").oninput = updateAndSave;
+    </script>
+  </body>
+</html>
