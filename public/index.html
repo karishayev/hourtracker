@@ -26,7 +26,6 @@
         min-height: 100vh;
       }
 
-      /* Екран авторизації */
       #auth-wrapper {
         display: flex;
         justify-content: center;
@@ -45,7 +44,6 @@
         box-sizing: border-box;
       }
 
-      /* Головний додаток із сайдбаром */
       #app-wrapper {
         display: none;
         width: 100vw;
@@ -53,7 +51,6 @@
         display: flex;
       }
 
-      /* Бокова панель навігації */
       .sidebar {
         width: 260px;
         background: var(--card-bg);
@@ -105,7 +102,6 @@
         padding-top: 15px;
       }
 
-      /* Основний контент справа */
       .main-content {
         flex-grow: 1;
         padding: 40px;
@@ -115,7 +111,7 @@
 
       .page-section {
         display: none;
-        max-width: 800px;
+        max-width: 850px;
       }
 
       .page-section.active {
@@ -128,7 +124,6 @@
         margin-bottom: 25px;
       }
 
-      /* Сітка елементів на головній сторінці */
       .dashboard-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -177,7 +172,6 @@
         box-sizing: border-box;
         font-size: 14px;
         outline: none;
-        transition: border-color 0.2s;
         font-family: inherit;
       }
 
@@ -229,10 +223,89 @@
         font-size: 13px;
         margin-top: 8px;
       }
+
+      /* Стилі для інтерактивного міні-календаря */
+      .calendar-container {
+        background: #fff;
+        border-radius: 8px;
+      }
+
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .calendar-header button {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        text-align: center;
+      }
+
+      .calendar-day-name {
+        font-size: 11px;
+        color: #9ca3af;
+        font-weight: bold;
+        padding-bottom: 5px;
+      }
+
+      .calendar-cell {
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        background: #f9fafb;
+        border: 1px solid var(--border-color);
+        transition: all 0.15s;
+        position: relative;
+      }
+
+      .calendar-cell:hover {
+        background: #eef2ff;
+        border-color: var(--primary);
+      }
+
+      .calendar-cell.selected {
+        background: var(--primary) !important;
+        color: white;
+        font-weight: bold;
+      }
+
+      .calendar-cell.has-note::after {
+        content: "";
+        width: 5px;
+        height: 5px;
+        background-color: var(--success);
+        border-radius: 50%;
+        position: absolute;
+        bottom: 3px;
+      }
+
+      .calendar-cell.selected.has-note::after {
+        background-color: #fff;
+      }
+
+      .calendar-cell.empty {
+        background: transparent;
+        border: none;
+        cursor: default;
+      }
     </style>
   </head>
   <body>
-    <!-- ЕКРАН АВТОРИЗАЦІЇ -->
+    <!-- АВТОРИЗАЦІЯ -->
     <div id="auth-wrapper">
       <div class="auth-card">
         <h2 id="form-title">Вхід в систему</h2>
@@ -257,9 +330,8 @@
       </div>
     </div>
 
-    <!-- ГОЛОВНИЙ ДОДАТОК З САЙДБАРОМ -->
-    <div id="app-wrapper" style="display: none">
-      <!-- Сайдбар навігації -->
+    <!-- ГОЛОВНИЙ ДОДАТОК -->
+    <div id="app-wrapper">
       <nav class="sidebar">
         <div class="sidebar-brand">⏱️ Hour Tracker</div>
         <ul class="nav-links">
@@ -279,14 +351,13 @@
         </div>
       </nav>
 
-      <!-- Основна робоча зона -->
       <main class="main-content">
         <!-- СТОРІНКА 1: ГОЛОВНА -->
         <section id="page-home" class="page-section active">
           <h2>Вітаю, <span id="user-display"></span>! 👋</h2>
 
           <div class="dashboard-grid">
-            <!-- Картка 1: Ставка і заробіток -->
+            <!-- Фінанси -->
             <div class="card">
               <h3>💰 Фінанси</h3>
               <div class="stats-row">
@@ -295,7 +366,7 @@
                   ><input
                     type="number"
                     id="rate-input"
-                    style="width: 90px; display: inline-block; padding: 5px"
+                    style="width: 80px; display: inline-block; padding: 4px"
                     oninput="updateRate()"
                   />
                   грн/год</span
@@ -309,27 +380,41 @@
               </div>
             </div>
 
-            <!-- Картка 2: Додати години за сьогодні -->
+            <!-- Інтерактивний календар на головній для введення годин -->
             <div class="card">
-              <h3>⏱️ Облік годин за сьогодні</h3>
-              <div class="input-group">
+              <h3>📅 Оберіть день для годин</h3>
+              <div class="calendar-container">
+                <div class="calendar-header">
+                  <button onclick="changeHomeMonth(-1)">‹</button>
+                  <span id="home-month-year"></span>
+                  <button onclick="changeHomeMonth(1)">›</button>
+                </div>
+                <div class="calendar-grid" id="home-calendar-grid"></div>
+              </div>
+              <div class="input-group" style="margin-top: 12px">
                 <label
-                  >Відпрацьовано годин (<span id="today-date-label"></span
+                  >Години для обраного дня (<span id="selected-home-date"
+                    >не обрано</span
                   >)</label
                 >
                 <input
                   type="number"
-                  id="hours-input"
-                  placeholder="Наприклад: 8"
-                  oninput="updateTodayHours()"
+                  id="home-hours-input"
+                  placeholder="Введіть години"
+                  oninput="saveHomeHours()"
                 />
               </div>
               <div id="save-status" class="success-msg"></div>
             </div>
 
-            <!-- Картка 3: Графік роботи і нотатки на сьогодні (На всю ширину) -->
+            <!-- Розклад і нотатки на сьогодні -->
             <div class="card card-full">
-              <h3>📌 Розклад та нотатки на сьогодні</h3>
+              <h3>
+                📌 Розклад та нотатки на сьогодні (<span
+                  id="today-date-label"
+                ></span
+                >)
+              </h3>
               <p style="margin: 0 0 10px 0">
                 <strong>Плановий графік:</strong>
                 <span
@@ -349,11 +434,10 @@
                   border-radius: 8px;
                   border: 1px solid var(--border-color);
                   color: #4b5563;
-                  min-height: 40px;
+                  min-height: 35px;
                 "
               >
-                Немає нотаток на сьогодні. Додайте їх у розділі «Календар і
-                плани».
+                Немає нотаток на сьогодні.
               </div>
             </div>
           </div>
@@ -362,36 +446,47 @@
         <!-- СТОРІНКА 2: КАЛЕНДАР І ПЛАНИ -->
         <section id="page-calendar" class="page-section">
           <h2>📅 Планування та графік</h2>
-          <div class="card">
-            <h3>Виберіть дату для налаштування графіку й нотатки</h3>
-            <div class="input-group">
-              <label>Дата</label>
-              <input
-                type="date"
-                id="calendar-date-picker"
-                onchange="loadDayData()"
-              />
+          <div class="dashboard-grid">
+            <div class="card">
+              <h3>Оберіть день у календарі</h3>
+              <div class="calendar-container">
+                <div class="calendar-header">
+                  <button onclick="changePlannerMonth(-1)">‹</button>
+                  <span id="planner-month-year"></span>
+                  <button onclick="changePlannerMonth(1)">›</button>
+                </div>
+                <div class="calendar-grid" id="planner-calendar-grid"></div>
+              </div>
             </div>
-            <div class="input-group">
-              <label>Графік роботи (наприклад: 9:00 - 18:00)</label>
-              <input
-                type="text"
-                id="calendar-schedule-input"
-                placeholder="Введіть графік"
-              />
+
+            <div class="card">
+              <h3>
+                Редагувати день:
+                <span
+                  id="planner-selected-date-label"
+                  style="color: var(--primary)"
+                  >не обрано</span
+                >
+              </h3>
+              <div class="input-group">
+                <label>Графік роботи (наприклад: 9:00 - 18:00)</label>
+                <input
+                  type="text"
+                  id="planner-schedule-input"
+                  placeholder="Введіть графік"
+                />
+              </div>
+              <div class="input-group">
+                <label>Нотатка / План на цей день</label>
+                <textarea
+                  id="planner-note-input"
+                  rows="4"
+                  placeholder="Що зробити?"
+                ></textarea>
+              </div>
+              <button onclick="savePlannerDay()">Зберегти плани</button>
+              <div id="calendar-save-status" class="success-msg"></div>
             </div>
-            <div class="input-group">
-              <label>Нотатка / Важливі плани на цей день</label>
-              <textarea
-                id="calendar-note-input"
-                rows="4"
-                placeholder="Що треба зробити в цей день?"
-              ></textarea>
-            </div>
-            <button onclick="saveCalendarDay()">
-              Зберегти плани на цей день
-            </button>
-            <div id="calendar-save-status" class="success-msg"></div>
           </div>
         </section>
       </main>
@@ -401,6 +496,12 @@
       let isRegisterMode = false;
       let currentUser = null;
       let userData = { rate: 0, logs: [] };
+
+      // Змінні для керування календарями
+      let homeDate = new Date();
+      let plannerDate = new Date();
+      let selectedHomeDateStr = new Date().toISOString().split("T")[0];
+      let selectedPlannerDateStr = new Date().toISOString().split("T")[0];
 
       function toggleAuthMode() {
         isRegisterMode = !isRegisterMode;
@@ -448,16 +549,17 @@
         document.getElementById("auth-wrapper").style.display = "none";
         document.getElementById("app-wrapper").style.display = "flex";
         document.getElementById("user-display").innerText = currentUser;
-
-        const todayStr = new Date().toISOString().split("T")[0];
-        document.getElementById("today-date-label").innerText = todayStr;
         document.getElementById("rate-input").value = userData.rate || "";
 
-        // Ініціалізація дати в календарі на сьогодні
-        document.getElementById("calendar-date-picker").value = todayStr;
-        loadDayData();
+        const todayStr = new Date().toISOString().split("T")[0];
+        selectedHomeDateStr = todayStr;
+        selectedPlannerDateStr = todayStr;
 
-        refreshHomeData();
+        renderHomeCalendar();
+        renderPlannerCalendar();
+        selectHomeDate(todayStr);
+        selectPlannerDate(todayStr);
+        refreshTodayCard();
         calculateEarnings();
       }
 
@@ -471,20 +573,97 @@
 
         document.getElementById("page-" + pageId).classList.add("active");
         document.getElementById("nav-" + pageId).classList.add("active");
+
+        if (pageId === "calendar") {
+          renderPlannerCalendar();
+        } else {
+          renderHomeCalendar();
+        }
       }
 
-      // Оновлення годин за сьогодні з головної сторінки
-      async function updateTodayHours() {
-        const hours =
-          parseFloat(document.getElementById("hours-input").value) || 0;
-        const todayStr = new Date().toISOString().split("T")[0];
+      // Рендер календаря для Головної сторінки
+      function renderHomeCalendar() {
+        const grid = document.getElementById("home-calendar-grid");
+        const monthLabel = document.getElementById("home-month-year");
+        grid.innerHTML = "";
 
-        let dayLog = userData.logs.find((l) => l.date === todayStr);
-        if (dayLog) {
-          dayLog.h = hours;
+        const year = homeDate.getFullYear();
+        const month = homeDate.getMonth();
+        const monthNames = [
+          "Січень",
+          "Лютий",
+          "Березень",
+          "Квітень",
+          "Травень",
+          "Червень",
+          "Липень",
+          "Серпень",
+          "Вересень",
+          "Жовтень",
+          "Листопад",
+          "Грудень",
+        ];
+        monthLabel.innerText = `${monthNames[month]} ${year}`;
+
+        ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"].forEach((day) => {
+          grid.innerHTML += `<div class="calendar-day-name">${day}</div>`;
+        });
+
+        const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDayIndex; i++) {
+          grid.innerHTML += `<div class="calendar-cell empty"></div>`;
+        }
+
+        for (let day = 1; day <= totalDays; day++) {
+          const dateStr = `${year}-${String(month + 1).padStart(
+            2,
+            "0"
+          )}-${String(day).padStart(2, "0")}`;
+          const cell = document.createElement("div");
+          cell.className = "calendar-cell";
+          cell.innerText = day;
+
+          const log = userData.logs.find((l) => l.date === dateStr);
+          if (log && (log.note || log.schedule)) {
+            cell.classList.add("has-note");
+          }
+          if (dateStr === selectedHomeDateStr) {
+            cell.classList.add("selected");
+          }
+
+          cell.onclick = () => selectHomeDate(dateStr);
+          grid.appendChild(cell);
+        }
+      }
+
+      function changeHomeMonth(direction) {
+        homeDate.setMonth(homeDate.getMonth() + direction);
+        renderHomeCalendar();
+      }
+
+      function selectHomeDate(dateStr) {
+        selectedHomeDateStr = dateStr;
+        document.getElementById("selected-home-date").innerText = dateStr;
+
+        const log = userData.logs.find((l) => l.date === dateStr);
+        document.getElementById("home-hours-input").value = log
+          ? log.h || ""
+          : "";
+        renderHomeCalendar();
+      }
+
+      async function saveHomeHours() {
+        const hours =
+          parseFloat(document.getElementById("home-hours-input").value) || 0;
+        let log = userData.logs.find((l) => l.date === selectedHomeDateStr);
+
+        if (log) {
+          log.h = hours;
         } else {
           userData.logs.push({
-            date: todayStr,
+            date: selectedHomeDateStr,
             schedule: "",
             h: hours,
             note: "",
@@ -492,71 +671,119 @@
         }
 
         calculateEarnings();
+        refreshTodayCard();
+        renderHomeCalendar();
         await saveToServer("Збережено ✓", "save-status");
       }
 
-      async function updateRate() {
-        userData.rate =
-          parseFloat(document.getElementById("rate-input").value) || 0;
-        calculateEarnings();
-        await saveToServer("Збережено ✓", "save-status");
-      }
+      // Рендер календаря для сторінки Планувальника
+      function renderPlannerCalendar() {
+        const grid = document.getElementById("planner-calendar-grid");
+        const monthLabel = document.getElementById("planner-month-year");
+        grid.innerHTML = "";
 
-      // Завантаження даних обраного дня у вкладці "Календар"
-      function loadDayData() {
-        const selectedDate = document.getElementById(
-          "calendar-date-picker"
-        ).value;
-        const dayLog = userData.logs.find((l) => l.date === selectedDate);
+        const year = plannerDate.getFullYear();
+        const month = plannerDate.getMonth();
+        const monthNames = [
+          "Січень",
+          "Лютий",
+          "Березень",
+          "Квітень",
+          "Травень",
+          "Червень",
+          "Липень",
+          "Серпень",
+          "Вересень",
+          "Жовтень",
+          "Листопад",
+          "Грудень",
+        ];
+        monthLabel.innerText = `${monthNames[month]} ${year}`;
 
-        if (dayLog) {
-          document.getElementById("calendar-schedule-input").value =
-            dayLog.schedule || "";
-          document.getElementById("calendar-note-input").value =
-            dayLog.note || "";
-        } else {
-          document.getElementById("calendar-schedule-input").value = "";
-          document.getElementById("calendar-note-input").value = "";
+        ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"].forEach((day) => {
+          grid.innerHTML += `<div class="calendar-day-name">${day}</div>`;
+        });
+
+        const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDayIndex; i++) {
+          grid.innerHTML += `<div class="calendar-cell empty"></div>`;
+        }
+
+        for (let day = 1; day <= totalDays; day++) {
+          const dateStr = `${year}-${String(month + 1).padStart(
+            2,
+            "0"
+          )}-${String(day).padStart(2, "0")}`;
+          const cell = document.createElement("div");
+          cell.className = "calendar-cell";
+          cell.innerText = day;
+
+          const log = userData.logs.find((l) => l.date === dateStr);
+          if (log && (log.note || log.schedule)) {
+            cell.classList.add("has-note");
+          }
+          if (dateStr === selectedPlannerDateStr) {
+            cell.classList.add("selected");
+          }
+
+          cell.onclick = () => selectPlannerDate(dateStr);
+          grid.appendChild(cell);
         }
       }
 
-      // Збереження графіку/нотатки з вкладки "Календар"
-      async function saveCalendarDay() {
-        const selectedDate = document.getElementById(
-          "calendar-date-picker"
-        ).value;
+      function changePlannerMonth(direction) {
+        plannerDate.setMonth(plannerDate.getMonth() + direction);
+        renderPlannerCalendar();
+      }
+
+      function selectPlannerDate(dateStr) {
+        selectedPlannerDateStr = dateStr;
+        document.getElementById("planner-selected-date-label").innerText =
+          dateStr;
+
+        const log = userData.logs.find((l) => l.date === dateStr);
+        document.getElementById("planner-schedule-input").value = log
+          ? log.schedule || ""
+          : "";
+        document.getElementById("planner-note-input").value = log
+          ? log.note || ""
+          : "";
+        renderPlannerCalendar();
+      }
+
+      async function savePlannerDay() {
         const schedule = document
-          .getElementById("calendar-schedule-input")
+          .getElementById("planner-schedule-input")
           .value.trim();
-        const note = document
-          .getElementById("calendar-note-input")
-          .value.trim();
+        const note = document.getElementById("planner-note-input").value.trim();
 
-        if (!selectedDate) return;
-
-        let dayLog = userData.logs.find((l) => l.date === selectedDate);
-        if (dayLog) {
-          dayLog.schedule = schedule;
-          dayLog.note = note;
+        let log = userData.logs.find((l) => l.date === selectedPlannerDateStr);
+        if (log) {
+          log.schedule = schedule;
+          log.note = note;
         } else {
           userData.logs.push({
-            date: selectedDate,
+            date: selectedPlannerDateStr,
             schedule: schedule,
             h: 0,
             note: note,
           });
         }
 
-        refreshHomeData();
+        renderPlannerCalendar();
+        renderHomeCalendar();
+        refreshTodayCard();
         await saveToServer(
-          "План успішно збережено у календар! ✓",
+          "Плани збережено у календар! ✓",
           "calendar-save-status"
         );
       }
 
-      // Оновлення відображення на головній сторінці
-      function refreshHomeData() {
+      function refreshTodayCard() {
         const todayStr = new Date().toISOString().split("T")[0];
+        document.getElementById("today-date-label").innerText = todayStr;
         const todayLog = userData.logs.find((l) => l.date === todayStr);
 
         if (todayLog) {
@@ -564,14 +791,19 @@
             todayLog.schedule || "Не задано в календарі";
           document.getElementById("today-note-display").innerText =
             todayLog.note || "Немає нотаток на сьогодні.";
-          document.getElementById("hours-input").value = todayLog.h || "";
         } else {
           document.getElementById("today-schedule-display").innerText =
             "Не задано в календарі";
           document.getElementById("today-note-display").innerText =
             "Немає нотаток на сьогодні.";
-          document.getElementById("hours-input").value = "";
         }
+      }
+
+      async function updateRate() {
+        userData.rate =
+          parseFloat(document.getElementById("rate-input").value) || 0;
+        calculateEarnings();
+        await saveToServer("Збережено ✓", "save-status");
       }
 
       function calculateEarnings() {
@@ -602,7 +834,7 @@
             statusEl.innerText = "";
           }, 2000);
         } catch (err) {
-          console.error("Помилка збереження на сервері");
+          console.error("Помилка збереження");
         }
       }
 
