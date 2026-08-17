@@ -26,11 +26,12 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   rate: { type: Number, default: 0 },
+  currency: { type: String, default: "грн" }, // Додали поле для валюти
   logs: [
     {
       date: String, // Формат "YYYY-MM-DD"
       schedule: String, // Наприклад, "9:00 - 18:00"
-      actualHours: Number, // Фактичні години, що вводяться на головній
+      h: Number, // Фактичні години (має бути саме 'h', як на фронтенді!)
       note: String, // Нотатка або задача на цей день
     },
   ],
@@ -71,7 +72,12 @@ app.post("/api/login", async (req, res) => {
     }
     res.json({
       success: true,
-      user: { username: user.username, rate: user.rate, logs: user.logs },
+      user: {
+        username: user.username,
+        rate: user.rate,
+        currency: user.currency || "грн",
+        logs: user.logs,
+      },
     });
   } catch (err) {
     res.status(500).json({ success: false, message: "Помилка сервера." });
