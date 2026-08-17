@@ -488,9 +488,11 @@
                   type="number"
                   id="home-hours-input"
                   placeholder="Введіть години"
-                  oninput="saveHomeHours()"
                 />
               </div>
+              <button onclick="saveHomeHoursManually()">
+                Зберегти години за день
+              </button>
               <div id="save-status" class="success-msg"></div>
             </div>
 
@@ -745,7 +747,7 @@
         renderHomeCalendar();
       }
 
-      async function saveHomeHours() {
+      async function saveHomeHoursManually() {
         const hours =
           parseFloat(document.getElementById("home-hours-input").value) || 0;
         let log = userData.logs.find((l) => l.date === selectedHomeDateStr);
@@ -762,9 +764,8 @@
         }
 
         calculateEarnings();
-        refreshTodayCard();
         renderHomeCalendar();
-        await saveToServer("Збережено ✓", "save-status");
+        await saveToServer("Години успішно збережено! ✓", "save-status");
       }
 
       function renderPlannerCalendar() {
