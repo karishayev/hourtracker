@@ -81,10 +81,10 @@ app.post("/api/login", async (req, res) => {
 // Оновлення даних (ставки, годин, графіків і нотаток)
 app.post("/api/update", async (req, res) => {
   try {
-    const { username, rate, logs } = req.body;
+    const { username, rate, currency, logs } = req.body;
     const user = await User.findOneAndUpdate(
       { username },
-      { rate, logs },
+      { rate, currency, logs },
       { new: true }
     );
     if (!user)
